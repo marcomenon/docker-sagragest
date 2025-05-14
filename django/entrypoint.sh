@@ -1,0 +1,30 @@
+#!/bin/bash
+set -e
+
+echo "[django] Applico le migration..."
+python manage.py makemigrations accounts printers reports sagragest sagrarapid --noinput
+python manage.py migrate --noinput
+
+echo "[django] Colleziono static..."
+python manage.py collectstatic --noinput
+
+# Crea superuser solo se non esiste
+echo "[django] Verifico superuser..."
+python manage.py shell <<PYTHON_EOF
+from django.contrib.auth import get_user_model
+import os
+
+User = get_user_model()
+username = os.environ.get("DJANGO_SUPERUSER_USERNAME", "admin")
+email = os.environ.get("DJANGO_SUPERUSER_EMAIL", "admin@example.com")
+password = os.environ.get("DJANGO_SUPERUSER_PASSWORD", "changeme")
+
+if not User.objects.filter(username=username).exists():
+    print(f"[django] Creo superuser '{username}'")
+    User.objects.create_superuser(username=username, email=email, password=password)
+else:
+    print(f"[django] Superuser '{username}' già presente")
+PYTHON_EOF
+
+echo "[django] Avvio Gunicorn..."
+exec uv gunicorn --bind unix:/run/gunicorn.sock --umask 007 core.wsgi:application
