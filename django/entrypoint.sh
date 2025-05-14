@@ -26,5 +26,9 @@ else:
     print(f"[django] Superuser '{username}' già presente")
 PYTHON_EOF
 
+# Preparo una sottocartella per il socket
+mkdir -p /run/gunicorn
+chmod 777 /run/gunicorn
+
 echo "[django] Avvio Gunicorn..."
-exec uv gunicorn --bind unix:/run/gunicorn.sock --umask 007 core.wsgi:application
+exec gunicorn --bind unix:/run/gunicorn/gunicorn.sock --umask 000 core.wsgi:application

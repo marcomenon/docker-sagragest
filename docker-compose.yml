@@ -42,9 +42,9 @@ services:
       - "host.docker.internal:host-gateway"
     restart: always
     volumes:
-      - static_data:/app/static
+      - static_data:/app/staticfiles
       - media_data:/app/media
-      - gunicorn_socket:/run
+      - gunicorn_socket:/run/gunicorn
     depends_on:
       db:
         condition: service_healthy
@@ -67,7 +67,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - static_data:/static:ro
       - media_data:/media:ro
-      - gunicorn_socket:/run:ro
+      - gunicorn_socket:/run/gunicorn:ro
     depends_on:
       - django
     logging:
