@@ -1,10 +1,43 @@
-FROM debian:bookworm-slim
+FROM debian:12-slim
 
-RUN apt-get update && apt-get install -y cups && \
-    sed -i 's/Listen localhost:631/Port 631/' /etc/cups/cupsd.conf && \
-    sed -i '/<Location \/>/,/<\/Location>/ s/Require local/Allow all/' /etc/cups/cupsd.conf && \
-    sed -i '/<Location \/admin>/,/<\/Location>/ s/Require local/Allow all/' /etc/cups/cupsd.conf && \
-    sed -i '/<Location \/admin\/conf>/,/<\/Location>/ s/Require local/Allow all/' /etc/cups/cupsd.conf && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Rome
+ENV CUPS_ADMIN=admin
+ENV CUPS_PASSWORD=changeme
 
-CMD ["/usr/sbin/cupsd", "-f"]
+RUN apt-get update -qq && apt-get upgrade -qqy \
+    && apt-get install -qqy \
+    apt-utils \
+    usbutils \
+    cups \
+    cups-filters \
+    printer-driver-all \
+    printer-driver-cups-pdf \
+    printer-driver-foo2zjs \
+    foomatic-db-compressed-ppds \
+    openprinting-ppds \
+    hpijs-ppds \
+    hp-ppd \
+    hplip \
+    avahi-daemon \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+EXPOSE 631
+EXPOSE 5353/udp
+
+RUN sed -i 's/Listen localhost:631/Listen 0.0.0.0:631/' /etc/cups/cupsd.conf && \
+    sed -i 's/Browsing Off/Browsing On/' /etc/cups/cupsd.conf && \
+    sed -i 's/<Location \/>/<Location \/>\n  Allow All/' /etc/cups/cupsd.conf && \
+    sed -i 's/<Location \/admin>/<Location \/admin>\n  Allow All\n  Require user @SYSTEM/' /etc/cups/cupsd.conf && \
+    sed -i 's/<Location \/admin\/conf>/<Location \/admin\/conf>\n  Allow All/' /etc/cups/cupsd.conf && \
+    echo "ServerAlias *" >> /etc/cups/cupsd.conf && \
+    echo "DefaultEncryption Never" >> /etc/cups/cupsd.conf
+
+RUN cp -rp /etc/cups /cups-bak
+VOLUME [ "/etc/cups" ]
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]

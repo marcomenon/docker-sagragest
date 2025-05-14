@@ -1,5 +1,4 @@
 services:
-
   db:
     image: postgres:16
     restart: always
@@ -42,6 +41,7 @@ services:
       - "host.docker.internal:host-gateway"
     restart: always
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - static_data:/app/staticfiles
       - media_data:/app/media
       - gunicorn_socket:/run/gunicorn
@@ -64,6 +64,7 @@ services:
     ports:
       - "80:80"
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - static_data:/static:ro
       - media_data:/media:ro
@@ -80,11 +81,14 @@ services:
 
   cups:
     build: ./cups
+    env_file: .env
     restart: always
+    devices:
+      - "/dev/bus/usb:/dev/bus/usb"
     ports:
       - "631:631"
     volumes:
-      - ./cups/cupsd:/etc/cups
+      - cups-data:/etc/cups
     logging:
       driver: "json-file"
       options:
@@ -99,6 +103,7 @@ volumes:
   gunicorn_socket:
   postgres-data:
   redis-data:
+  cups-data:
 
 networks:
   backend:

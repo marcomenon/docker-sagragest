@@ -1,7 +1,8 @@
 FROM python:3.13.3-slim-bookworm
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    TZ=Europe/Rome
 
 WORKDIR /app
 
@@ -25,6 +26,12 @@ RUN apt-get update && apt-get install -y \
     libgdk-pixbuf2.0-0 \
     fonts-liberation \
     fonts-dejavu \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y \
+    tzdata \
+    && ln -fs /usr/share/zoneinfo/$TZ /etc/localtime \
+    && dpkg-reconfigure -f noninteractive tzdata \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Copia uv e installa
