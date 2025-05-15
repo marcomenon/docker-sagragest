@@ -14,4 +14,12 @@ if [ ! -f /etc/cups/cupsd.conf ]; then
     cp -rpn /cups-bak/* /etc/cups/
 fi
 
+# Avvia dbus e avahi-daemon per il discovery Bonjour/mDNS solo se non già in esecuzione
+if ! pgrep -x dbus-daemon > /dev/null; then
+    dbus-daemon --system &
+fi
+if ! pgrep -x avahi-daemon > /dev/null; then
+    avahi-daemon --daemonize --no-chroot
+fi
+
 exec /usr/sbin/cupsd -f

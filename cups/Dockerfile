@@ -20,6 +20,7 @@ RUN apt-get update -qq && apt-get upgrade -qqy \
     hp-ppd \
     hplip \
     avahi-daemon \
+    dbus \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
