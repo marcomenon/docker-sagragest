@@ -64,6 +64,9 @@ read -s -p "Superuser password [superpassword]: " DJANGO_SUPERUSER_PASSWORD
 DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD:-superpassword}
 echo
 
+read -p "Dominio per il sito [example.com]: " DOMINIO
+DOMINIO=${DOMINIO:-example.com}
+
 cat > .env <<EOF
 # 🔐 Sicurezza
 DJANGO_SECRET_KEY=$DJANGO_SECRET_KEY
@@ -106,6 +109,8 @@ DJANGO_SUPERUSER_PASSWORD=$DJANGO_SUPERUSER_PASSWORD
 
 # 🐳 Docker
 TZ=$TZ
+
+DOMINIO=$DOMINIO
 EOF
 
 echo ".env generato con successo!"

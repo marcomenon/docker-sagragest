@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 # Carica le variabili d'ambiente dal file .env nella root del progetto
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS')
 
