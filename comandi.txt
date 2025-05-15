@@ -374,3 +374,4 @@ echo "[django] Avvio Gunicorn..."
 exec uv gunicorn --bind unix:/run/gunicorn.sock --umask 007 core.wsgi:application
 EOF
 
+sudo timedatectl set-timezone Europe/Rome
