@@ -34,22 +34,28 @@ RUN apt-get update && apt-get install -y \
     && dpkg-reconfigure -f noninteractive tzdata \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Crea utente e gruppo con UID e GID 1000
+RUN groupadd -g 1000 devuser && useradd -u 1000 -g 1000 -m devuser
+
+# Imposta i permessi sulla cartella di lavoro
+RUN mkdir -p /app && chown -R devuser:devuser /app
+
 # Copia uv e installa
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.7.4 /uv /uvx /bin/
 
 # Copia requirements e installa pacchetti
 COPY requirements.txt .
 RUN uv pip install -r requirements.txt --system
 
-# Copia il progetto
-COPY . .
+USER devuser
+WORKDIR /app
 
-# Assicura che il socket venga creato in /run
-RUN mkdir -p /run && chmod 777 /run
+ENV PYTHONPYCACHEPREFIX=/app/.pycache
 
-# Copia entrypoint
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+# Copia lo script di entrypoint e rendilo eseguibile
+COPY --chown=devuser:devuser entrypoint.dev.sh /entrypoint.dev.sh
+RUN chmod +x /entrypoint.dev.sh
 
-# Esegui lo script
-CMD ["/entrypoint.sh"]
+# Imposta l'entrypoint
+ENTRYPOINT ["/entrypoint.dev.sh"]
+

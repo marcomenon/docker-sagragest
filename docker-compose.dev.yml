@@ -1,0 +1,48 @@
+services:
+  django:
+    build:
+      context: ./django
+      dockerfile: dev.Dockerfile
+    environment:
+      TZ: Europe/Rome
+      CUPS_SERVER: cups
+    volumes:
+      - ./django:/app
+    ports:
+      - "8000:8000"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - devbackend
+
+  cups:
+    build: ./cups
+    environment:
+      TZ: Europe/Rome
+      CUPS_ADMIN: admin
+      CUPS_PASSWORD: admin
+    env_file: .env
+    restart: always
+    devices:
+      - "/dev/bus/usb:/dev/bus/usb"
+    ports:
+      - "631:631"
+      - "5353:5353/udp"
+    volumes:
+      - cups-data:/etc/cups
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - devbackend
+
+volumes:
+  cups-data:
+
+networks:
+  devbackend:

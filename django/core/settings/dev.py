@@ -26,4 +26,4 @@ INSTALLED_APPS += [
     # 'nome_app_sviluppo',
 ]
 
-CUPS_SERVER = "http://host.docker.internal:631"
+CUPS_SERVER = os.getenv("CUPS_SERVER", "http://host.docker.internal:631")

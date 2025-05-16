@@ -1,0 +1,20 @@
+# Escludi file e cartelle inutili dal build Docker di sviluppo
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.log
+*.env
+*.DS_Store
+*.vscode/
+*.idea/
+*.git/
+*.gitignore
+*.dockerignore
+node_modules/
+# Escludi file di produzione
+prod.Dockerfile
+entrypoint.prod.sh
+docker-compose.prod.yml

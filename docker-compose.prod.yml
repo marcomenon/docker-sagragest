@@ -1,4 +1,3 @@
-# Aggiornato: ora ci sono Dockerfile.dev, Dockerfile.prod, docker-compose.dev.yml e docker-compose.prod.yml
 services:
   db:
     image: postgres:16
@@ -36,7 +35,9 @@ services:
       - backend
 
   django:
-    build: ./django
+    build:
+      context: ./django
+      dockerfile: prod.Dockerfile
     env_file: .env
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -100,30 +101,10 @@ services:
     networks:
       - backend
 
-  samba:
-    image: dperson/samba
-    restart: always
-    env_file: .env
-    command: -p -u "${SAMBA_USER};${SAMBA_PASS}" -s "templates;/mount;yes;no;yes"
-    ports:
-      - "139:139"
-      - "445:445"
-    volumes:
-      - ./django/printers/templates/printers:/mount
-    mem_limit: 512m
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    networks:
-      - backend
-
 volumes:
   static_data:
   media_data:
   gunicorn_socket:
-  postgres-data:
   redis-data:
   cups-data:
 

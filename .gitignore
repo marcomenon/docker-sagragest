@@ -50,3 +50,9 @@ docker-compose.override.yml
 
 # Nginx log
 nginx/logs/
+
+# Ignora i file delle migrazioni Django (tranne __init__.py)
+**/migrations/*.py
+
+# Ignora i file di configurazione di Docker
+.dockerignore
